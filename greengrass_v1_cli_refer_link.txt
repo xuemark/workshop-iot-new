@@ -1,0 +1,98 @@
+https://qiita.com/uhey22e/items/c8965c4f8fe0636aae29
+
+
+aws greengrass create-group --cli-input-json '{
+    "Name": "'"${GROUP_NAME}"'",
+    "InitialVersion": {
+        "CoreDefinitionVersionArn": "'"${CORE_DEF_LATEST_VER_ARN}"'",
+        "FunctionDefinitionVersionArn": "'"${FUNC_DEF_LATEST_VER_ARN}"'",
+        "SubscriptionDefinitionVersionArn": "'"${SUBS_DEF_LATEST_VER_ARN}"'",
+        "ResourceDefinitionVersionArn": "'"${RES_DEF_LATEST_VER_ARN}"'",
+        "LoggerDefinitionVersionArn": "'"${LOG_DEF_LATEST_VER_ARN}"'"
+    }
+}'
+
+
+
+aws greengrass create-group-version --cli-input-json file://new_group_ver.json
+
+
+{
+  "FunctionDefinitionVersionArn": "arn:aws:greengrass:ap-northeast-1:{AWS_ACCOUNT_ID}:/greengrass/definition/functions/{FUNC_DEF_ID}/versions/{NEW_FUNC_DEF_VER_ID}",
+  "CoreDefinitionVersionArn": "...",
+  "LoggerDefinitionVersionArn": "...",
+  "ResourceDefinitionVersionArn": "...",
+  "SubscriptionDefinitionVersionArn": "...",
+  "GroupId": "{GROUP_ID}"
+}
+
+$ aws greengrass create-function-definition-version --cli-input-json file://new_func_def_ver.json
+
+{
+  "FunctionDefinitionId": "${FUNC_DEF_ID}",
+  "Functions": [
+    {
+      "FunctionArn": "arn:aws:lambda:::function:GGIPDetector:1",
+      "FunctionConfiguration": {
+        "Environment": {},
+        "MemorySize": 32768,
+        "Pinned": true,
+        "Timeout": 3
+      },
+      "Id": "$(uuidgen)"
+    },
+    {
+      "FunctionArn": "arn:aws:lambda:ap-northeast-1:{AWS_ACCOUNT_ID}:function:greengrass-hello-world:LATEST",
+      "FunctionConfiguration": {
+        "Environment": {},
+        "MemorySize": 32768,
+        "Pinned": true,
+        "Timeout": 30
+      },
+      "Id": "$(uuidgen)"
+    }
+
+  ]
+}
+
+
+$ aws greengrass create-logger-definition \
+  --cli-input-json $(echo $CLI_INPUT_JSON | jq -cr ".")
+  
+CLI_INPUT_JSON='{
+  "Name": "'"${GROUP_NAME}_Logger_Definition"'",
+  "InitialVersion": {
+    "Loggers": [
+      {
+        "Component": "Lambda",
+        "Id": "'"$(uuidgen | awk '{print tolower($1)}')"'",
+        "Level": "INFO",
+        "Space": 25600,
+        "Type": "FileSystem"
+      },
+      {
+        "Component": "GreengrassSystem",
+        "Id": "'"$(uuidgen | awk '{print tolower($1)}')"'",
+        "Level": "INFO",
+        "Space": 25600,
+        "Type": "FileSystem"
+      },
+      {
+        "Component": "Lambda",
+        "Id": "'"$(uuidgen | awk '{print tolower($1)}')"'",
+        "Level": "INFO",
+        "Type": "AWSCloudWatch"
+      },
+      {
+        "Component": "GreengrassSystem",
+        "Id": "'"$(uuidgen | awk '{print tolower($1)}')"'",
+        "Level": "INFO",
+        "Type": "AWSCloudWatch"
+      }
+    ]
+  }
+}'
+
+
+
+
