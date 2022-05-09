@@ -14,6 +14,6 @@ AWS IoT的参考架构如下：
 
 ## 3. [Device Shadow Sample Code](3.device_shadow.md)
 
-## 4. [Rule Engine Sample Code](4.create_rule)
+## 4. [Rule Engine Sample Code](4.create_rule_engine.md)
 
 ## 5. [Greengrass V2 Installation and Config](5.greengrass_v2_cn.md)
